@@ -1,28 +1,45 @@
 trigger AccountTrigger on Account (before insert, before update, before delete, after insert, after update, after delete, after undelete) {
-    if (Org_Specific_Setting__mdt.getInstance('Run_All_Triggers')?.Value__c == true) {
-        TriggerHandler handler = new AccountTriggerHandler(Trigger.isExecuting, Trigger.size);
-        switch on Trigger.operationType {
-            when BEFORE_INSERT {
-                // handler.beforeInsert(Trigger.new);
-            } 
-            when BEFORE_UPDATE {
-                // handler.beforeUpdate(Trigger.old, Trigger.new, Trigger.oldMap, Trigger.newMap);
+    if(Trigger.isInsert && Trigger.isBefore){
+        //Updating the Shipping Address similar to Billing Address while creation of account.
+        for(Account acc: Trigger.new){
+            if(acc.BillingStreet != null){
+                acc.ShippingStreet = acc.BillingStreet;
             }
-            when BEFORE_DELETE {
-                // handler.beforeDelete(Trigger.old, Trigger.oldMap);
+            if(acc.BillingCity != null){
+                acc.ShippingCity = acc.BillingCity;
             }
-            when AFTER_INSERT {
-                // handler.afterInsert(Trigger.new, Trigger.newMap);
+            if(acc.BillingState != null){
+                acc.ShippingState = acc.BillingState;
             }
-            when AFTER_UPDATE {
-                // handler.afterUpdate(Trigger.old, Trigger.new, Trigger.oldMap, Trigger.newMap);
+            if(acc.BillingPostalCode != null){
+                acc.ShippingPostalCode = acc.BillingPostalCode;
             }
-            when AFTER_DELETE {
-                // handler.afterDelete(Trigger.old, Trigger.oldMap);
-            } 
-            when AFTER_UNDELETE {
-                // handler.afterUndelete(Trigger.new, Trigger.newMap);
+            if(acc.BillingCountry != null){
+                acc.ShippingCountry = acc.BillingCountry;
+            }   
+        }
+    }
+
+    if(Trigger.isAfter && Trigger.isUpdate){
+        //Updating Status of Opportunity to Closed Lost if Created Date is less than 30 days.
+        Set<Id> accountIds = new Set<Id>();
+        for(Account acc: Trigger.new){
+            accountIds.add(acc.Id);
+        }
+
+        List<Opportunity> oppListToUpdate=new List<Opportunity>();
+        DateTime day30=system.now()-30;
+        List<Opportunity> oppList = new List<Opportunity>([SELECT Id, AccountId, StageName, CreatedDate, CloseDate FROM Opportunity WHERE AccountId IN:accountIds]);
+        if(oppList.size()>0){
+            for(Opportunity opp: oppList){
+                if(opp.CreatedDate<day30 && opp.StageName != 'Closed Won'){
+                    opp.StageName = 'Closed Lost';
+                    oppListToUpdate.add(opp);
+                }
             }
+        }
+        if(oppListToUpdate.size() > 0){
+            update oppListToUpdate;
         }
     }
 }
