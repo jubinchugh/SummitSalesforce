@@ -42,4 +42,24 @@ trigger AccountTrigger on Account (before insert, before update, before delete, 
             update oppListToUpdate;
         }
     }
+
+    if(Trigger.isAfter && Trigger.isInsert){
+
+        //To send the email upon Account Creation.
+        List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
+        User userObj=[SELECT Id,Profile.Name,Email from User WHERE Profile.Name='System Administrator' AND FirstName = 'Jubin'];
+
+        for(Account acc:Trigger.new){
+            if(userObj.Email != null){
+                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                EmailTemplate template = [SELECT Id FROM EmailTemplate WHERE DeveloperName = 'Jubin Chugh' LIMIT 1];
+                mail.toAddresses = new String[]{userObj.Email};
+                mails.add(mail);
+            }
+        }
+
+        if(mails.size()>0){
+            Messaging.SendEmailResult[] results = Messaging.sendEmail(mails);
+            }
+    }
 }
