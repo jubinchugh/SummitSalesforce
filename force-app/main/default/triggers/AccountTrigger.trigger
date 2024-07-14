@@ -52,14 +52,31 @@ trigger AccountTrigger on Account (before insert, before update, before delete, 
         for(Account acc:Trigger.new){
             if(userObj.Email != null){
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                EmailTemplate template = [SELECT Id FROM EmailTemplate WHERE DeveloperName = 'Jubin Chugh' LIMIT 1];
+                //EmailTemplate template = [SELECT Id FROM EmailTemplate WHERE DeveloperName = 'Jubin Chugh' LIMIT 1];
                 mail.toAddresses = new String[]{userObj.Email};
                 mails.add(mail);
             }
         }
 
         if(mails.size()>0){
-            Messaging.SendEmailResult[] results = Messaging.sendEmail(mails);
-            }
+            //Messaging.SendEmailResult[] results = Messaging.sendEmail(mails);
+        }
+
+        //Contact Gets created upon account creation with the name as Account
+        List<Contact> listOfContactsToBeInserted = new List<Contact>();
+        Set<Account> setOfAccountToBeInserted = new Set<Account>();
+        Map<Id, Account> mapVariable = new Map<Id, Account>();
+        Set<Id> accId = new Set<Id>();
+        for(Account acc: Trigger.new){
+            Contact con = new Contact();
+            con.AccountId = acc.Id;
+            con.LastName = acc.Name;
+            listOfContactsToBeInserted.add(con);
+        }
+
+        if(listOfContactsToBeInserted.size()>0){
+            insert listOfContactsToBeInserted;
+        }
+
     }
 }
