@@ -1,0 +1,13 @@
+<template>
+    <template lwc:if={ready}>
+        <lightning-card>
+            <div class="slds-m-around_medium">
+                <p>Hello, {greeting}!</p>
+                <lightning-input label="Name" value={greeting} onchange={changeHandler}></lightning-input>
+            </div>
+        </lightning-card>
+    </template>
+    <template lwc:else>
+        <div id="waiting">Loading…</div>
+    </template>
+</template>
