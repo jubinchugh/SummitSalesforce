@@ -8,7 +8,7 @@ public without sharing class ContactTriggerHandler implements TriggerHandler {
         this.helper = new ContactTriggerHelper();
     }
     public void beforeInsert(List<Contact> newContacts) {
-        helper.firstLastNameDissimilarity(newContacts);
+        //helper.firstLastNameDissimilarity(newContacts);
         // helper.doTask2();
     }
     public void beforeUpdate(List<Contact> oldContacts, List<Contact> newContacts, Map<ID, SObject> oldContactMap, Map<ID, SObject> newContactMap) {

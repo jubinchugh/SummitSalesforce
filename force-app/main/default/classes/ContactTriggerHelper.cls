@@ -18,11 +18,11 @@ public without sharing class ContactTriggerHelper {
         //System.debug('Inside Task 5');
     }
 
-    public void firstLastNameDissimilarity(List<Contact> newConRecords ){
+    /*public void firstLastNameDissimilarity(List<Contact> newConRecords ){
         for(Contact con: newConRecords){
             if(con.HomePhone == con.Phone){
                 con.addError('Home Phone & Phone can\'t be same');
             }
         }
-    }
+    }*/
 }
